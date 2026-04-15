@@ -1,0 +1,13 @@
+{
+  "name": "minecraft-status-api",
+  "version": "1.0.0",
+  "description": "Proste API do sprawdzania statusu serwera Minecraft/Aternos",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "minecraft-server-util": "^5.4.4"
+  }
+}
