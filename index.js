@@ -6,6 +6,13 @@ const PORT = process.env.PORT || 3000;
 const server = process.env.MC_HOST || 'KitekMC.aternos.me';
 const minecraftPort = Number(process.env.MC_PORT || 50615);
 
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+});
+
 function buildOfflineResponse(error = 'Server is offline') {
     return {
         online: false,
@@ -17,7 +24,8 @@ function buildOfflineResponse(error = 'Server is offline') {
             online: 0,
             max: 0
         },
-        motd: error
+        motd: error,
+        checkedAt: new Date().toISOString()
     };
 }
 
@@ -45,7 +53,7 @@ async function getServerStatus() {
         const version = data.version?.name_clean || data.version?.name_raw || 'Nieznana';
         const playersOnline = Number(data.players?.online || 0);
         const playersMax = Number(data.players?.max || 0);
-        const motd = (data.motd?.clean || '').toString().trim();
+        const motd = String(data.motd?.clean || '').trim();
 
         return {
             online: true,
@@ -57,7 +65,8 @@ async function getServerStatus() {
                 online: playersOnline,
                 max: playersMax
             },
-            motd
+            motd,
+            checkedAt: new Date().toISOString()
         };
     } catch (error) {
         return buildOfflineResponse(error.message);
@@ -73,7 +82,10 @@ app.get('/status', async (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-    res.json({ ok: true });
+    res.json({
+        ok: true,
+        checkedAt: new Date().toISOString()
+    });
 });
 
 app.listen(PORT, () => {
